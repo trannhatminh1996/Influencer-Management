@@ -5,8 +5,7 @@ class BaseRepository implements BaseRepositoryContract
 {
     protected $model;
 
-    protected $assoc = true;
-
+    //Add prefix field to a given data list
     protected function convertFieldsOnList($data)
     {
         $convert = [];
@@ -18,7 +17,7 @@ class BaseRepository implements BaseRepositoryContract
 
         return $convert;
     }
-
+    //Add prefix field to a given array
     protected function convertFieldsOnArray($data)
     {
         $convert = [];
@@ -29,17 +28,10 @@ class BaseRepository implements BaseRepositoryContract
         }
         return $convert;
     }
-
-    public function setAssoc($bool) 
-    {
-        $this->assoc = $bool;
-    }
-
+    //Get information on a single table based on conditions, fields and orderBy conditions
     public function getAll($condition = [], $field = [] , $orderBy = []) 
     {
-        if ($this->assoc) {
-            $condition['flag_status'] = config('constant.flag_status.active');
-        }
+        $condition['flag_status'] = config('constant.flag_status.active');
         $condition = $this->convertFieldsOnList($condition);
         $field = $this->convertFieldsOnArray($field);
         $orderBy = $this->convertFieldsOnList($orderBy);
@@ -49,10 +41,13 @@ class BaseRepository implements BaseRepositoryContract
         }
         return $data->get();
     }
-
+    //Insert data
     public function insert($data = [])
     {
         if ($data) {
+            $date = date('Y-m-d H:i:s');
+            $data['create_at'] = $date;
+            $data['update_at'] = $date;
             $data = $this->convertFieldsOnList($data);
 
             $this->model->insert($data);
@@ -60,10 +55,12 @@ class BaseRepository implements BaseRepositoryContract
         }
         return false;
     }
-
+    //update data
     public function update($data = [], $condition = [])
     {
         if ($data && $condition) {
+            $date = date('Y-m-d H:i:s');
+            $data['update_at'] = $date;
             $data = $this->convertFieldsOnList($data);
             $condition = $this->convertFieldsOnList($condition);
             $this->model->where($condition)->update($data);
@@ -71,7 +68,7 @@ class BaseRepository implements BaseRepositoryContract
         }
         return false;
     }
-
+    //delete data
     public function delete($condition = [])
     {
         if ($condition) {
@@ -80,5 +77,18 @@ class BaseRepository implements BaseRepositoryContract
             return true;
         }
         return false;
+    }
+    //Get last inserted data id
+    public function getCurrentDataId(){
+        $primaryKey =  $this->model->primaryKey;
+        return $this->model->orderBy($this->model->getKeyName(),'DESC')->first()->$primaryKey;
+    }
+    //check if databased contains the data with given conditions
+    public function checkContains($condition = []) {
+        if ($condition) {
+            $condition = $this->convertFieldsOnList($condition);
+            $data = $this->model->where($condition)->first();
+            return $data;
+        }
     }
 }
