@@ -14,4 +14,7 @@
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('influencer',['as'=>'influencer.index', 'uses'=> 'InfluencerController@index']);
+Route::get('influencer/view',['as'=>'influencer.view', 'uses'=> 'InfluencerController@view']);
+Route::get('influencer/insert', ['as'=>'influencer.insert', 'uses'=> 'InfluencerController@insert']);
+Route::get('influencer/testParagraph', ['as'=>'influencer.test_paragraph', 'uses'=> 'InfluencerController@testParagraph']);
+Route::get('influencer/testMaxPrimeNumber', ['as'=>'influencer.test_max_prime_number', 'uses'=> 'InfluencerController@testMaxPrimeNumber']);

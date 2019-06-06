@@ -33,15 +33,15 @@ class InfluencerService implements InfluencerServiceContract
     public function viewInfluencerList($condition = []) 
     {
         // Get condition of year based on age
-        if ($condition['age_from']) {
+        if (isset($condition['age_from'])) {
             $ageFrom = strtotime('-' . $condition['age_from'] . ' year', time());
             $condition['date_from'] =  date("Y-m-d", $ageFrom);
         }
-        if ($condition['age_to']) {
+        if (isset($condition['age_to'])) {
             $ageTo = strtotime('-' . $condition['age_to'] . ' year', time());
             $condition['date_to'] =  date("Y-m-d", $ageTo);
         }
-        return $this->influencerRepository->getInfluencer($condition);
+        return $this->formattedData($this->influencerRepository->getInfluencer($condition));
     }
 
     //insert an influencer
@@ -109,5 +109,31 @@ class InfluencerService implements InfluencerServiceContract
             $dataReturn['bank_number'] = $data['bank_number'];
         }
         return $dataReturn;
+    }
+
+    private function formattedData($modelData) 
+    {
+        $returnData = [];
+        foreach ($modelData as $key => $item) {
+            $returnData[$key]['name'] = $item->name;
+            $returnData[$key]['phone'] = $item->phone;
+            $returnData[$key]['birthday'] = $item->birthday;
+            $returnData[$key]['gender'] = $item->Male;
+            $returnData[$key]['email'] = $item->email;
+            $returnData[$key]['adress'] = $item->adress;
+            $returnData[$key]['interaction_average_number'] = $item->interaction_average_number;
+            $returnData[$key]['identification_number'] = $item->identification_number;
+            $returnData[$key]['bank_number'] = $item->bank_number;
+            foreach ($item->job as $job) {
+                $returnData[$key]['job'][] = $job->job_title;
+            }
+            foreach ($item->post as $post) {
+                $returnData[$key]['post'][] = $post->post_content;
+            }
+            foreach ($item->link as $link) {
+                $returnData[$key]['link'][$link->media_type] = $link->link;
+            }
+        }
+        return $returnData;
     }
 }

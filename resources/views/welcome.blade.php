@@ -65,7 +65,6 @@
     </head>
     <body>
         <div class="flex-center position-ref full-height">
-            <p>{{getMaximumPrimeNumberOnIntegerElement(1223)}}</p>
             @if (Route::has('login'))
                 <div class="top-right links">
                     @auth
